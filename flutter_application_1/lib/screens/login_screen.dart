@@ -1,17 +1,17 @@
 import 'package:flutter/material.dart';
 import 'home_screen.dart'; 
 import 'register_screen.dart';
-
+import 'package:firebase_auth/firebase_auth.dart';
 
 class LoginScreen extends StatelessWidget {
- 
+  
   final TextEditingController emailController = TextEditingController();
   final TextEditingController passwordController = TextEditingController();
-
+  final FirebaseAuth _auth = FirebaseAuth.instance;
   
-  final String validEmail = "11111@certus.edu.pe";
+ // final String validEmail = "11111@certus.edu.pe";
   
-  final String validPassword = "00000000";
+ // final String validPassword = "00000000";
 
   @override
   Widget build(BuildContext context) {
@@ -76,46 +76,54 @@ class LoginScreen extends StatelessWidget {
                 ),
                 const SizedBox(height: 20),
                 
+            
+                 
+               
                 ElevatedButton(
-                  onPressed: () {
-                   
-                    if (emailController.text == validEmail &&
-                        passwordController.text == validPassword) {
-                     
-                      Navigator.pushReplacement(
-                        context,
-                        MaterialPageRoute(builder: (context) => HomeScreen()), 
+                   onPressed: () async {
+                try {
+                  // Intenta autenticar con Firebase
+                  UserCredential userCredential = await _auth.signInWithEmailAndPassword(
+                    email: emailController.text,
+                    password: passwordController.text,
+                  );
+
+                  // Si la autenticación es exitosa, navega a la pantalla de inicio
+                  Navigator.pushReplacement(
+                    context,
+                    MaterialPageRoute(builder: (context) => HomeScreen()),
+                  );
+                } catch (e) {
+                  // Si hay error, muestra un mensaje de error
+                  showDialog(
+                    context: context,
+                    builder: (context) {
+                      return AlertDialog(
+                        title: Text('Error'),
+                        content: Text('Correo electrónico o contraseña incorrectos.'),
+                        actions: [
+                          TextButton(
+                            onPressed: () => Navigator.pop(context),
+                            child: Text('OK'),
+                          ),
+                        ],
                       );
-                    } else {
-                     
-                      showDialog(
-                        context: context,
-                        builder: (context) {
-                          return AlertDialog(
-                            title: Text('Error'),
-                            content: Text(
-                                'Correo electrónico o contraseña incorrectos.'),
-                            actions: [
-                              TextButton(
-                                onPressed: () => Navigator.pop(context),
-                                child: Text('OK'),
-                              ),
-                            ],
-                          );
-                        },
-                      );
-                    }
-                  },
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: Colors.grey[500],
-                    padding: const EdgeInsets.symmetric(
-                        horizontal: 100, vertical: 15),
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(10),
+                    },
+                  );
+                }
+              },
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: Colors.grey[500],
+                        padding: const EdgeInsets.symmetric(horizontal: 100, vertical: 15),
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(10),
+                        ),
+                      ),
+                      child: const Text('Iniciar sesión'),
                     ),
-                  ),
-                  child: const Text('Iniciar sesión'),
-                ),
+
+
+
                 const SizedBox(height: 10),
                 
                 TextButton(
